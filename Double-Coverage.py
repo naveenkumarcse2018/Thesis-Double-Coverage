@@ -63,6 +63,7 @@ class DoubleCoverage(object):
     def process_Request(self, request):
         if request in self.config:
             index = self.config.index(request)
+            print("The server is at requested location")
             self.vMove[index] = False
             self.vDirection[index] = 0
             self.vPosition[index] = -1
