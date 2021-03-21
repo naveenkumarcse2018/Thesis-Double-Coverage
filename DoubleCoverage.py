@@ -54,15 +54,14 @@ class DoubleCoverage(object):
 
     def distance(self, request, server):
         difference = abs(request-server)
-             # print("Actual distance is ",difference)
+        # print("Actual distance is ",difference)
         if difference > self.points/2:
             difference = self.points-difference
 
         return difference
 
     def process_Request(self, request):
-        n = self.points
-        print("NAveen")
+        n = self.servers
         if request in self.config:
             index = self.config.index(request)
             print("The server is at requested location")
@@ -71,7 +70,7 @@ class DoubleCoverage(object):
             self.vPosition[index] = -1
             return 0
         leftS, rightS = self.findTwoServers(request)
-        print("Left: ",leftS," Right: ",rightS)
+        print("Left: ", leftS, " Right: ", rightS)
         index_l = self.config.index(leftS)
         index_r = self.config.index(rightS)
 
@@ -89,16 +88,12 @@ class DoubleCoverage(object):
         # if there is any virtual moves for the servers then we need to take that positions to handle
         leftS = self.vPosition[index_l] if self.vMove[index_l] == True else leftS
         rightS = self.vPosition[index_r] if self.vMove[index_r] == True else rightS
-        print("Left: ",leftS," Right: ",rightS)
+        print("Left: ", leftS, " Right: ", rightS)
         # here check if the virtual servers is front of the requested location in same direction
 
         # distances
         dl = 0
         dr = 0
-        # print("NAveen")
-        # process request using moves
-        # 1. Check for the condition in which virtual and physical servers at equal distance
-
         while True:
             if rightS == n+1:
                 rightS = 1
@@ -123,7 +118,7 @@ class DoubleCoverage(object):
 
                         self.vPosition[index_r] = rightS
                         self.vDirection[index_r] = 1
-                        print("Server ",temp," served request ",request)
+                        print("Server ", temp, " served request ", request)
                         return self.distance(request, temp)
                     else:
                         temp = self.config[index_r]
@@ -136,7 +131,7 @@ class DoubleCoverage(object):
                         self.vDirection[index_l] = -1
 
                         # distance between server and request
-                        print("Server ",temp," served request ",request)
+                        print("Server ", temp, " served request ", request)
                         return self.distance(request, temp)
                 # right server is physical server and left side is virtual
                 elif self.vMove[index_r] == False and self.vMove[index_l] == True:
@@ -149,7 +144,7 @@ class DoubleCoverage(object):
                     self.vMove[index_l] = True
                     self.vPosition[index_l] = leftS
                     self.vDirection[index_l] = -1
-                    print("Server ",temp," served request ",request)
+                    print("Server ", temp, " served request ", request)
                     return self.distance(request, temp)
                 # left server is physical and right server is virtual
                 elif self.vMove[index_r] == True and self.vMove[index_l] == False:
@@ -162,7 +157,7 @@ class DoubleCoverage(object):
                     self.vMove[index_r] = True
                     self.vPosition[index_r] = rightS
                     self.vDirection[index_l] = 1
-                    print("Server ",temp," served request ",request)
+                    print("Server ", temp, " served request ", request)
 
                     return self.distance(request, temp)
                 # both are physical servers
@@ -176,7 +171,7 @@ class DoubleCoverage(object):
 
                         self.vPosition[index_r] = rightS
                         self.vDirection[index_r] = 1
-                        print("Server ",temp," served request ",request)
+                        print("Server ", temp, " served request ", request)
                         return self.distance(request, temp)
                     else:
                         temp = self.config[index_r]
@@ -189,7 +184,7 @@ class DoubleCoverage(object):
                         self.vDirection[index_l] = -1
 
                         # distance between server and request
-                        print("Server ",temp," served request ",request)
+                        print("Server ", temp, " served request ", request)
                         return self.distance(request, temp)
 
                 # write code for moving lower id server and make updates and break
@@ -206,7 +201,7 @@ class DoubleCoverage(object):
                 self.vMove[index_l] = True
                 self.vDirection[index_l] = -1
                 self.vPosition[index_l] = leftS
-                print("Server ",temp," served request ",request)
+                print("Server ", temp, " served request ", request)
                 return self.distance(request, temp)
                 # else:
 
@@ -222,7 +217,7 @@ class DoubleCoverage(object):
                 self.vMove[index_r] = True
                 self.vDirection[index_r] = 1
                 self.vPosition[index_r] = rightS
-                print("Server ",temp," served request ",request)
+                print("Server ", temp, " served request ", request)
                 return self.distance(request, temp)
                 # print()
             # print()
@@ -243,16 +238,16 @@ if __name__ == "__main__":
     # print(obj.vDirection)
     # print(obj.vMove)
     # print(obj.vPosition)
-    print("Initial configuration of the servers ",obj.config)
-    requestSequence=[11,1,3,7,17,4,5,6,17,4]
-    cost=0
+    print("Initial configuration of the servers ", obj.config)
+    requestSequence = [11, 1, 3, 7, 17, 4, 5, 6, 17, 4]
+    cost = 0
     # print(obj.vMove[0])
     for i in range(len(requestSequence)):
         print("\n----------------------------------------------")
         # print("Request--",requestSequence[i])
-        cost+=(obj.process_Request(requestSequence[i]))
+        cost += (obj.process_Request(requestSequence[i]))
 
-        print("\nConfiguration: ",obj.config," Cost: ",cost)
-        print("\nVirtual: ",obj.vMove)
-        print("Positions: ",obj.vPosition)
+        print("\nConfiguration: ", obj.config, " Cost: ", cost)
+        print("\nVirtual: ", obj.vMove)
+        print("Positions: ", obj.vPosition)
         print("----------------------------------------------")
