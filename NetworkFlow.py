@@ -297,8 +297,8 @@ class ServerSpace(object):
                     else:
                         totalCost += self.metric(
                             requests[rlist[-1]], requests[r])
-                    print("Server ", self.servers[s][0],
-                          "served request ", requests[r][0])
+                    # print("Server ", self.servers[s][0],
+                        #   "served request ", requests[r][0])
                     rlist.append(r)
                 for edge in graph.get_edges(v):
                     if graph.get_flow(edge) > 0:
