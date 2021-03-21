@@ -227,10 +227,10 @@ class ServerSpace(object):
 				corrosponding initial position"""
 
     def add_servers(self, poslist):
-        print("---Bfore--- ", self.servers)
+        # print("---Bfore--- ", self.servers)
         self.servers += poslist
-        print(poslist)
-        print("--- After --- ", self.servers)
+        # print(poslist)
+        # print("--- After --- ", self.servers)
 
     """Computes offline the optimal cost for processing a given
 				sequence of requests.
