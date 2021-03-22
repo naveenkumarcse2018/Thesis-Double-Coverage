@@ -2,6 +2,11 @@ import numpy as np
 import random
 import NetworkFlow
 from NetworkFlow import *
+import csv
+import pandas as pd
+
+# Import writer class from csv module 
+from csv import writer 
 
 points=0
 def metric(server, request):
@@ -117,8 +122,8 @@ class VirtualDoubleCoverage(object):
         return difference
 
     def makeUpdates(self, i, request):
-        print("Server ", self.configuration[i],
-              " is moved to requeste location ", request)
+        # print("Server ", self.configuration[i],
+            #   " is moved to requeste location ", request)
         self.configuration[i] = request
         self.vMove[i] = False
         self.vPosition[i] = self.configuration[i]
@@ -129,13 +134,13 @@ class VirtualDoubleCoverage(object):
         # physical server is at requested location but not having any virtual move
         if request in self.configuration and self.vMove[self.configuration.index(request)] == False:
             index = self.configuration.index(request)
-            print("Requested Location has server ")
+            # print("Requested Location has server ")
             self.makeUpdates(index, request)
             
             return 0, 0
         elif request in self.vPosition:  # If the virtual servers at requested location
             # if two are more virtual servers at location then serve with lower id
-            print("Requested Locations has virtual server")
+            # print("Requested Locations has virtual server")
             if self.vPosition.count(request) > 1:
                 ind = self.vPosition.index(request)
                 server_id = self.configuration[ind]
@@ -259,33 +264,53 @@ if __name__ == "__main__":
     # print(obj.configuration, obj.vPosition)
     # print("-----------------------------------")
 
-    # np.random.randint(1, n, 10)
-    sequence = [18,  6,  9, 12,  3,  2,  7,  8, 17,  6]#np.random.randint(1, n, 10)#[4,13,10,15,3,16,3,7,18]##[13, 8, 14, 9, 17, 15, 17, 15, 1, 2]
-    initial = [1, 13, 18]#random.sample(range(1, n), k)#[1,9,12]##[1, 5, 11]  # 
-    initial.sort()
-    initial_configuration = list(initial)
-    print("Request sequence: ", sequence)
-    print("Initial configurations ", initial, initial_configuration)
-    test = VirtualDoubleCoverage(n, k, initial)
-    points=n
-    vCost = 0
-    pCost = 0
-    for i in range(len(sequence)):
-        print("-----------------------------------------------")
-        p, v = test.processRequest(sequence[i])
+    # # np.random.randint(1, n, 10)
+    # sequence = [18,  6,  9, 12,  3,  2,  7,  8, 17,  6]#np.random.randint(1, n, 10)#[4,13,10,15,3,16,3,7,18]##[13, 8, 14, 9, 17, 15, 17, 15, 1, 2]
+    # initial = [1, 13, 18]#random.sample(range(1, n), k)#[1,9,12]##[1, 5, 11]  # 
 
-        print("Physical configurations: ", test.configuration)
-        print("Virtual configurations: ", test.vPosition)
-        print("Virtual distance : ",test.vDistance)
-        print("Virtual cost: ",v," Physical cost: ",p)
-        vCost += v
-        pCost += p
-        print("-----------------------------------------------\n")
-    print(initial_configuration)
-    opt = ServerSpace(metric)
-    opt.add_servers(initial_configuration)
-    optimal_cost=opt.process_requests(sequence)[0]
-    print("Total physical cost: ", pCost)
-    print("Total virtual cost: ", vCost)
-    print("Optimal cost: ",optimal_cost)
-    print("Competitive ratio: ", vCost/optimal_cost)
+
+    n = 150
+    k = 100
+    for t in range(10):
+        print("\nTEST CASE ,",t+1)
+        sequence=np.random.randint(1,n,100)
+        initial=random.sample(range(1,n),k)
+        initial.sort()
+        initial_configuration = list(initial)
+        print("Request sequence: ", sequence)
+        print("Initial configurations ", initial, initial_configuration)
+        test = VirtualDoubleCoverage(n, k, initial)
+        points=n
+        vCost = 0
+        pCost = 0
+        print()
+        for i in range(len(sequence)):
+            # print("-----------------------------------------------")
+            p, v = test.processRequest(sequence[i])
+
+            # print("Physical configurations: ", test.configuration)
+            # print("Virtual configurations: ", test.vPosition)
+            # print("Virtual distance : ",test.vDistance)
+            # print("Virtual cost: ",v," Physical cost: ",p)
+            vCost += v
+            pCost += p
+            # print("-----------------------------------------------\n")
+        print(initial_configuration)
+        opt = ServerSpace(metric)
+        opt.add_servers(initial_configuration)
+        optimal_cost=opt.process_requests(sequence)[0]
+        print("Total physical cost: ", pCost)
+        print("Total virtual cost: ", vCost)
+        print("Optimal cost: ",optimal_cost)
+        print("(Virtual ) Competitive ratio: ", 1 if vCost==optimal_cost else vCost/optimal_cost)
+        print("(Physical ) Competitive ratio: ", 1 if pCost==optimal_cost else  pCost/optimal_cost)
+        print()
+        #fields=['VirtualDC-Cost','PhysicalCost','OptimalCost','vCost/OPT','pCost/OPT,'Sequence']
+        li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
+        with open('dataset.csv','a') as csvfile:
+            csvwriter=writer(csvfile)
+            # csvwriter.writerow(fields)
+            csvwriter.writerow(li)
+            csvfile.close()
+        print(len(sequence))
+

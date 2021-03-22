@@ -245,7 +245,7 @@ class ServerSpace(object):
         ventity = {}
         v = 1
         ns = len(self.servers)
-        print("No.of servers ", ns, "\n")
+        # print("No.of servers ", ns, "\n")
         nr = len(requests)
         n = ns + 2*nr + 1
 
