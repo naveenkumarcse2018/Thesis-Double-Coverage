@@ -53,7 +53,7 @@ class VirtualDoubleCoverage(object):
         if request == n:
             for i in range(1, request-1, 1):
                 if i in self.configuration:
-                    leftServer = -1
+                    leftServer = i
                     break
         else:
             for i in range(request+1, n+1, 1):
@@ -71,6 +71,7 @@ class VirtualDoubleCoverage(object):
         return leftServer, rightServer
 
     def findTwoVirtualServers(self, request):
+        # print("Request has ",request)
         rightServer = -1
         n = self.points
         k = self.noOfServers
@@ -85,7 +86,7 @@ class VirtualDoubleCoverage(object):
                     rightServer = i
                     break
             if rightServer == -1:
-                for i in range(n, request, -1):
+                for i in range(n, request-1, -1):
                     if i == request:
                         break
                     if i in self.vPosition:
@@ -93,9 +94,10 @@ class VirtualDoubleCoverage(object):
                         break
         leftServer = -1
         if request == n:
+            # print("Naveen")
             for i in range(1, request-1, 1):
                 if i in self.vPosition:
-                    leftServer = -1
+                    leftServer = i
                     break
         else:
             for i in range(request+1, n+1, 1):
@@ -164,6 +166,8 @@ class VirtualDoubleCoverage(object):
                 return physical_cost, virtual_cost
         else:
             leftS, rightS = self.findTwoVirtualServers(request)
+            # print("Right ",rightS, " left ",leftS)
+            # print(self.vPosition)
             left_index = self.vPosition.index(leftS)
             right_index = self.vPosition.index(rightS)
 
@@ -173,7 +177,7 @@ class VirtualDoubleCoverage(object):
 
             leftS_distance = self.vDistance[left_index]
             rightS_distance = self.vDistance[right_index]
-            # print("Right ",rightS, " left ",leftS)
+            
             # print("Right ",rightS, " left ",leftS)
 
             while True:
@@ -269,12 +273,12 @@ if __name__ == "__main__":
     # initial = [1, 13, 18]#random.sample(range(1, n), k)#[1,9,12]##[1, 5, 11]  # 
 
 
-    n = 150
-    k = 100
-    for t in range(10):
+    n = 20
+    k = 3
+    for t in range(1):
         print("\nTEST CASE ,",t+1)
-        sequence=np.random.randint(1,n,100)
-        initial=random.sample(range(1,n),k)
+        sequence=np.random.randint(1,n+1,10)#[6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#
+        initial=random.sample(range(1,n),k)#[1, 3, 11]#
         initial.sort()
         initial_configuration = list(initial)
         print("Request sequence: ", sequence)
@@ -295,7 +299,7 @@ if __name__ == "__main__":
             vCost += v
             pCost += p
             # print("-----------------------------------------------\n")
-        print(initial_configuration)
+        # print(initial_configuration)
         opt = ServerSpace(metric)
         opt.add_servers(initial_configuration)
         optimal_cost=opt.process_requests(sequence)[0]
@@ -306,11 +310,11 @@ if __name__ == "__main__":
         print("(Physical ) Competitive ratio: ", 1 if pCost==optimal_cost else  pCost/optimal_cost)
         print()
         #fields=['VirtualDC-Cost','PhysicalCost','OptimalCost','vCost/OPT','pCost/OPT,'Sequence']
-        li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
-        with open('dataset.csv','a') as csvfile:
-            csvwriter=writer(csvfile)
-            # csvwriter.writerow(fields)
-            csvwriter.writerow(li)
-            csvfile.close()
-        print(len(sequence))
+        # li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
+        # with open('dataset.csv','a') as csvfile:
+        #     csvwriter=writer(csvfile)
+        #     # csvwriter.writerow(fields)
+        #     csvwriter.writerow(li)
+        #     csvfile.close()
+        # print(len(sequence))
 
