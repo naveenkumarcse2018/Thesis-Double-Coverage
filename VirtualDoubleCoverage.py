@@ -5,10 +5,12 @@ from NetworkFlow import *
 import csv
 import pandas as pd
 
-# Import writer class from csv module 
-from csv import writer 
+# Import writer class from csv module
+from csv import writer
 
-points=0
+points = 0
+
+
 def metric(server, request):
     # print("server ",server, "request ",request)
     difference = abs(request-server)
@@ -125,7 +127,7 @@ class VirtualDoubleCoverage(object):
 
     def makeUpdates(self, i, request):
         # print("Server ", self.configuration[i],
-            #   " is moved to requeste location ", request)
+        #   " is moved to requeste location ", request)
         self.configuration[i] = request
         self.vMove[i] = False
         self.vPosition[i] = self.configuration[i]
@@ -138,7 +140,7 @@ class VirtualDoubleCoverage(object):
             index = self.configuration.index(request)
             # print("Requested Location has server ")
             self.makeUpdates(index, request)
-            
+
             return 0, 0
         elif request in self.vPosition:  # If the virtual servers at requested location
             # if two are more virtual servers at location then serve with lower id
@@ -177,7 +179,7 @@ class VirtualDoubleCoverage(object):
 
             leftS_distance = self.vDistance[left_index]
             rightS_distance = self.vDistance[right_index]
-            
+
             # print("Right ",rightS, " left ",leftS)
 
             while True:
@@ -270,51 +272,58 @@ if __name__ == "__main__":
 
     # # np.random.randint(1, n, 10)
     # sequence = [18,  6,  9, 12,  3,  2,  7,  8, 17,  6]#np.random.randint(1, n, 10)#[4,13,10,15,3,16,3,7,18]##[13, 8, 14, 9, 17, 15, 17, 15, 1, 2]
-    # initial = [1, 13, 18]#random.sample(range(1, n), k)#[1,9,12]##[1, 5, 11]  # 
-
+    # initial = [1, 13, 18]#random.sample(range(1, n), k)#[1,9,12]##[1, 5, 11]  #
 
     n = 20
     k = 3
     for t in range(1):
-        print("\nTEST CASE ,",t+1)
-        sequence=np.random.randint(1,n+1,10)#[6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#
-        initial=random.sample(range(1,n),k)#[1, 3, 11]#
+        print("\nTEST CASE ,", t+1)
+        # [6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#[4,19,1,6,12,1,4,6,6,10]#
+        sequence = np.random.randint(1, n+1, 10)
+        initial = random.sample(range(1, n), k)  # [1, 3, 11]#[7, 8, 17]#
+        # print(sequence)
         initial.sort()
         initial_configuration = list(initial)
+        print("First,", initial_configuration)
         print("Request sequence: ", sequence)
         print("Initial configurations ", initial, initial_configuration)
         test = VirtualDoubleCoverage(n, k, initial)
-        points=n
+        points = n
         vCost = 0
         pCost = 0
         print()
         for i in range(len(sequence)):
-            # print("-----------------------------------------------")
+            print("-----------------------------------------------")
             p, v = test.processRequest(sequence[i])
 
-            # print("Physical configurations: ", test.configuration)
-            # print("Virtual configurations: ", test.vPosition)
-            # print("Virtual distance : ",test.vDistance)
-            # print("Virtual cost: ",v," Physical cost: ",p)
+            print("Physical configurations: ", test.configuration)
+            print("Virtual configurations: ", test.vPosition)
+            print("Virtual distance : ",test.vDistance)
+            print("Virtual cost: ",v," Physical cost: ",p)
             vCost += v
             pCost += p
-            # print("-----------------------------------------------\n")
+            print("-----------------------------------------------\n")
         # print(initial_configuration)
         opt = ServerSpace(metric)
+        print("Second,", initial_configuration)
         opt.add_servers(initial_configuration)
-        optimal_cost=opt.process_requests(sequence)[0]
+        optimal_cost = opt.process_requests(sequence)[0]
+        # optimal_cost=1 if optimal_cost==0 else optimal_cost
         print("Total physical cost: ", pCost)
         print("Total virtual cost: ", vCost)
-        print("Optimal cost: ",optimal_cost)
-        print("(Virtual ) Competitive ratio: ", 1 if vCost==optimal_cost else vCost/optimal_cost)
-        print("(Physical ) Competitive ratio: ", 1 if pCost==optimal_cost else  pCost/optimal_cost)
+        print("Optimal cost: ", optimal_cost)
+        pCost = 1 if pCost == 0 else pCost
+        vCost = 1 if vCost == 0 else vCost
+        optimal_cost = 1 if optimal_cost == 0 else optimal_cost
+        print("(Virtual ) Competitive ratio: ", vCost/optimal_cost)
+        print("(Physical ) Competitive ratio: ", pCost/optimal_cost)
         print()
-        #fields=['VirtualDC-Cost','PhysicalCost','OptimalCost','vCost/OPT','pCost/OPT,'Sequence']
-        # li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
-        # with open('dataset.csv','a') as csvfile:
+        # fields=['VirtualDC-Cost','PhysicalCost','OptimalCost','vCost
+
+        li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
+        # with open('special-Case.csv','a') as csvfile:
         #     csvwriter=writer(csvfile)
         #     # csvwriter.writerow(fields)
         #     csvwriter.writerow(li)
         #     csvfile.close()
-        # print(len(sequence))
-
+        print(len(sequence))
