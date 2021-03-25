@@ -10,25 +10,41 @@ from csv import writer
 
 points = 0
 
+"""
+This metric function will calucate the distance between two points on a cycle
+
+"""
+
 
 def metric(server, request):
-    # print("server ",server, "request ",request)
     difference = abs(request-server)
-    # print("Actual distance is ",difference)
     if difference > points/2:
         difference = points-difference
 
     return difference
 
 
+"""
+This class will implement Double Coverage algorithm on cycle
+"""
+
+
 class VirtualDoubleCoverage(object):
-    def __init__(self, n, k, config):
-        self.noOfServers = k
-        self.points = n
-        self.configuration = config
+    def __init__(self, n, k, config):  # initialization of class object
+        self.noOfServers = k          # total no.of servers
+        self.points = n               # Points on cycle
+        self.configuration = config   # Configuration of servers
+        # True if server has virtual move
         self.vMove = [False for i in range(k)]
-        self.vPosition = [config[i] for i in range(k)]
+        self.vPosition = [config[i]
+            for i in range(k)]  # virtual server positions
+        # virtual server travelled distance
         self.vDistance = [0 for i in range(k)]
+
+    """
+        This function takes a point (requested location) and returns the two servers in which the request
+        is placed. We say these two servers as left and right servers.
+    """
 
     def findTwoServers(self, request):
         rightServer = -1
@@ -71,6 +87,12 @@ class VirtualDoubleCoverage(object):
 
         # RIGHT server will move in clock-wise direction and LEFT server will move in anti-clock-wise direction
         return leftServer, rightServer
+
+
+    """
+    This function takes a requested location and returns two virtual servers which
+    right and left side of the request. (The request will be between these two servers)
+    """
 
     def findTwoVirtualServers(self, request):
         # print("Request has ",request)
@@ -116,6 +138,7 @@ class VirtualDoubleCoverage(object):
         # RIGHT server will move in clock-wise direction and LEFT server will move in anti-clock-wise direction
         return leftServer, rightServer
 
+    # Calculates distance between two points
     def distance(self, server, request):
         # print("server ",server, "request ",request)
         difference = abs(request-server)
@@ -125,13 +148,20 @@ class VirtualDoubleCoverage(object):
 
         return difference
 
+    """
+        This function will take server id by which the request is server and changes the configurations
+        and other needful updates. 
+    """
     def makeUpdates(self, i, request):
-        # print("Server ", self.configuration[i],
-        #   " is moved to requeste location ", request)
         self.configuration[i] = request
         self.vMove[i] = False
         self.vPosition[i] = self.configuration[i]
         self.vDistance[i] = 0
+
+    """
+        This processRequest function will take a request and serves it using Double Coverage algorithm.
+
+    """
 
     def processRequest(self, request):
         n = self.points
@@ -143,6 +173,7 @@ class VirtualDoubleCoverage(object):
 
             return 0, 0
         elif request in self.vPosition:  # If the virtual servers at requested location
+
             # if two are more virtual servers at location then serve with lower id
             # print("Requested Locations has virtual server")
             if self.vPosition.count(request) > 1:
@@ -252,35 +283,11 @@ class VirtualDoubleCoverage(object):
 if __name__ == "__main__":
     n = 20
     k = 3
-    # obj = VirtualDoubleCoverage(10, 2, [1, 8])
-    # print(obj.noOfServers)
-    # print(obj.points)
-    # print(obj.configuration)
-    # print(obj.vMove)
-    # print(obj.vPosition)
-    # print(obj.vDistance)
-    # request = 5
-    # leftS, rightS = obj.findTwoServers(request)
-    # print(leftS, "<--- ", request, " --->", rightS)
-    # print("-------------------------------")
-    # print(obj.configuration)
-    # print("Cost: ",obj.processRequest(request))
-    # print(obj.configuration, obj.vPosition)
-    # print("Cost: ",obj.processRequest(2))
-    # print(obj.configuration, obj.vPosition)
-    # print("-----------------------------------")
-
-    # # np.random.randint(1, n, 10)
-    # sequence = [18,  6,  9, 12,  3,  2,  7,  8, 17,  6]#np.random.randint(1, n, 10)#[4,13,10,15,3,16,3,7,18]##[13, 8, 14, 9, 17, 15, 17, 15, 1, 2]
-    # initial = [1, 13, 18]#random.sample(range(1, n), k)#[1,9,12]##[1, 5, 11]  #
-
-    n = 20
-    k = 3
     for t in range(1):
         print("\nTEST CASE ,", t+1)
-        # [6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#[4,19,1,6,12,1,4,6,6,10]#
-        sequence = np.random.randint(1, n+1, 10)
-        initial = random.sample(range(1, n), k)  # [1, 3, 11]#[7, 8, 17]#
+        # [6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#
+        sequence = [4,19,1,6,12,1,4,6,6,10]#np.random.randint(1, n+1, 10)
+        initial = [7, 8, 17]#random.sample(range(1, n), k)  # [1, 3, 11]#
         # print(sequence)
         initial.sort()
         initial_configuration = list(initial)
@@ -298,8 +305,8 @@ if __name__ == "__main__":
 
             print("Physical configurations: ", test.configuration)
             print("Virtual configurations: ", test.vPosition)
-            print("Virtual distance : ",test.vDistance)
-            print("Virtual cost: ",v," Physical cost: ",p)
+            print("Virtual distance : ", test.vDistance)
+            print("Virtual cost: ", v, " Physical cost: ",p)
             vCost += v
             pCost += p
             print("-----------------------------------------------\n")
@@ -320,7 +327,7 @@ if __name__ == "__main__":
         print()
         # fields=['VirtualDC-Cost','PhysicalCost','OptimalCost','vCost
 
-        li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
+        li = [vCost, pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
         # with open('special-Case.csv','a') as csvfile:
         #     csvwriter=writer(csvfile)
         #     # csvwriter.writerow(fields)
