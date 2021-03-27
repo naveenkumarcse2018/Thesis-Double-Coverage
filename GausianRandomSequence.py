@@ -20,12 +20,12 @@ def metric(server, request):
     return difference
 
 
-n = 100
-k = 50
+n = 20
+k = 3
 points = n
-for t in range(10):
+for t in range(1):
     print("\nTEST: ",t)
-    r = np.random.normal(loc=10, scale=1, size=150)
+    r = np.random.normal(loc=10, scale=1, size=50)
     # print(r)
     sequence = [round(e) for e in r]
     sequence = [i if i> 0 and i <= n else n for i in sequence]
@@ -63,14 +63,20 @@ for t in range(10):
         optimal_cost else pCost/optimal_cost)
     print()
     li=[vCost,pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
-    with open('dataset.csv','a') as csvfile:
-        csvwriter=writer(csvfile)
-        # csvwriter.writerow(fields)
-        csvwriter.writerow(li)
-        csvfile.close()
+    # with open('dataset.csv','a') as csvfile:
+    #     csvwriter=writer(csvfile)
+    #     # csvwriter.writerow(fields)
+    #     csvwriter.writerow(li)
+    #     csvfile.close()
     print(len(sequence))
 # print(sequence.count(10))
 # print(sequence.count(9))
 # print(sequence.count(8))
 # print(sequence.count(11))
 # print(sequence.count(12))
+
+
+
+
+#[11, 9, 13, 9, 9, 10, 13, 10, 8, 11, 10, 9, 10, 11, 10, 10, 10, 10, 9, 10, 10, 9, 9, 11, 10, 12, 10, 8, 9, 11, 11, 10, 9, 11, 10, 12, 9, 10, 10, 11, 10, 10, 10, 10, 8, 10, 10, 11, 9, 10, 10, 9, 10, 12, 9, 10, 9, 10, 10, 11, 11, 11, 11, 10, 9, 10, 11, 11, 10, 11, 10, 11, 12, 10, 10, 9, 10, 10, 11, 10, 10, 11, 9, 9, 8, 8, 10, 10, 11, 10, 8, 11, 10, 11, 10, 9, 8, 10, 8, 9, 10, 9, 10, 10, 11, 10, 11, 9, 9, 11, 13, 9, 11, 11, 10, 9, 9, 9, 10, 11, 9, 11, 10, 9, 8, 10, 9, 11, 11, 11, 9, 11, 9, 11, 12, 10, 11, 10, 10, 11, 12, 11, 11, 11, 9, 11, 9, 9, 10, 11]
+#[5, 8, 10, 12, 14]
