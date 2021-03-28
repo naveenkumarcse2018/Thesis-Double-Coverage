@@ -9,6 +9,7 @@ import pandas as pd
 from csv import writer
 
 points = 0
+latest_served_location=0
 
 """
 This metric function will calucate the distance between two points on a cycle
@@ -30,7 +31,7 @@ This class will implement Double Coverage algorithm on cycle
 
 
 class VirtualDoubleCoverage(object):
-    def __init__(self, n, k, config):  # initialization of class object
+    def __init__(self, n, k, config,r):  # initialization of class object
         self.noOfServers = k          # total no.of servers
         self.points = n               # Points on cycle
         self.configuration = config   # Configuration of servers
@@ -40,6 +41,7 @@ class VirtualDoubleCoverage(object):
             for i in range(k)]  # virtual server positions
         # virtual server travelled distance
         self.vDistance = [0 for i in range(k)]
+        self.latest_server=r
 
     """
         This function takes a point (requested location) and returns the two servers in which the request
@@ -154,6 +156,9 @@ class VirtualDoubleCoverage(object):
     """
     def makeUpdates(self, i, request):
         print("Request ",request ," is served by the server ",self.configuration[i])
+        # print("BEFORE HERE---------------", self.latest_server)
+        self.latest_server=self.configuration[i]
+        # print("HERE------------------", self.latest_server)
         self.configuration[i] = request
         self.vMove[i] = False
         self.vPosition[i] = self.configuration[i]
@@ -284,27 +289,44 @@ class VirtualDoubleCoverage(object):
 if __name__ == "__main__":
     n = 20
     k = 3
-    for t in range(1):
+
+    for t in range(10):
         print("\nTEST CASE ,", t+1)
+        test_flag_count=0
+        previous_request=-1
+        request_sequence=list()
         # [6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#
-        sequence = [9, 11, 8, 10, 12, 8, 9, 9, 10, 10, 11, 11, 9, 10, 10, 11, 10, 9, 11, 9, 10, 11, 9, 10, 12, 9, 10, 11, 10, 10, 9, 9, 9, 9, 10, 8, 9, 9, 11, 10, 11, 10, 11, 10, 10, 9, 10, 11, 10, 9]#[11, 9, 13, 9, 9, 10, 13, 10, 8, 11, 10, 9, 10, 11, 10, 10, 10, 10, 9, 10, 10, 9, 9, 11, 10, 12, 10, 8, 9, 11, 11, 10, 9, 11, 10, 12, 9, 10, 10, 11, 10, 10, 10, 10, 8, 10, 10, 11, 9, 10, 10, 9, 10, 12, 9, 10, 9, 10, 10, 11, 11, 11, 11, 10, 9, 10, 11, 11, 10, 11, 10, 11, 12, 10, 10, 9, 10, 10, 11, 10, 10, 11, 9, 9, 8, 8, 10, 10, 11, 10, 8, 11, 10, 11, 10, 9, 8, 10, 8, 9, 10, 9, 10, 10, 11, 10, 11, 9, 9, 11, 13, 9, 11, 11, 10, 9, 9, 9, 10, 11, 9, 11, 10, 9, 8, 10, 9, 11, 11, 11, 9, 11, 9, 11, 12, 10, 11, 10, 10, 11, 12, 11, 11, 11, 9, 11, 9, 9, 10, 11]#[9, 10, 9, 10, 12, 11, 9, 9, 9, 9, 11, 10, 8, 11, 9, 9, 10, 9, 11, 10, 11, 10, 11, 11, 10, 10, 10, 11, 10, 9, 9, 10, 9, 9, 11, 10, 13, 11, 9, 10, 11, 9, 9, 11, 12, 9, 9, 11, 11, 10, 11, 11, 8, 11, 12, 10, 8, 12, 9, 9, 13, 10, 10, 10, 10, 11, 10, 11, 11, 10, 8, 10, 11, 10, 11, 10, 9, 11, 11, 10, 9, 12, 10, 10, 11, 11, 11, 10, 9, 11, 10, 9, 8, 13, 11, 11, 10, 10, 10, 10, 10, 10, 9, 9, 9, 12, 11, 10, 12, 10, 9, 10, 9, 11, 11, 11, 10, 12, 11, 9, 10, 12, 10, 12, 9, 12, 12, 10, 10, 11, 13, 9, 12, 11, 9, 9, 11, 10, 8, 10, 11, 9, 12, 11, 9, 11, 9, 8, 11, 11, 10, 10, 9, 11, 9, 10, 9, 10, 10, 10, 9, 11, 11, 8, 9, 11, 8, 11, 10, 11, 10, 13, 10, 9, 9, 12, 9, 9, 10, 11, 10, 9, 10, 11, 10, 10, 11, 10, 9, 10, 9, 10, 10, 8, 8, 9, 10, 10, 9, 10]#[9, 10, 11, 10, 8, 10, 9, 10, 10, 9, 10, 10, 9, 11, 10, 8, 11, 11, 10, 10, 9, 12, 10, 10, 10, 12, 11, 10, 10, 9, 10, 9, 10, 11, 8, 9, 11, 11, 10, 10, 10, 9, 9, 11, 10, 11, 10, 11, 10, 10, 10, 9, 11, 10, 11, 10, 11, 11, 11, 11, 9, 10, 8, 10, 10, 10, 11, 8, 11, 10, 9, 10, 10, 12, 9, 11, 10, 11, 9, 10, 9, 10, 10, 9, 9, 10, 8, 9, 10, 11, 11, 12, 10, 13, 12, 8, 8, 11, 11, 9]#[11, 9, 9, 11, 10, 9, 10, 10, 10, 11, 9, 10, 11, 11, 8, 10, 8, 10, 9, 8, 11, 9, 12, 11, 10, 10, 9, 9, 10, 11, 10, 11, 12, 10, 10, 11, 10, 10, 10, 10, 10, 9, 10, 11, 9, 10, 9, 11, 10, 11]#np.random.randint(1, n+1, 10)
-        initial = [13, 14, 15]#[5, 8, 10, 12, 14]#[7, 8, 17,18,20]#random.sample(range(1, n+1), k)  # [1, 3, 11]#
+        # print(type(latest_served_location))
+        sequence = np.random.randint(1, n+1, 1)
+        # print("NP RANDOM ",sequence)
+        # print(type(sequence))
+        latest_served_location=(int)(sequence)
+        # print("Naveen ",latest_served_location)
+        request_sequence.append(latest_served_location)
+        initial = random.sample(range(1, n+1), k)  # [1, 3, 11]#
         # print(sequence)
         initial.sort()
         initial_configuration = list(initial)
         print("First,", initial_configuration)
         print("Request sequence: ", sequence)
         print("Initial configurations ", initial, initial_configuration)
-        test = VirtualDoubleCoverage(n, k, initial)
+        test = VirtualDoubleCoverage(n, k, initial,latest_served_location)
         points = n
         vCost = 0
         pCost = 0
-        # print(type(sequence[0]))
-        # exit()
         print()
-        for i in range(len(sequence)):
+        
+        while True:
+            # if previous_request==latest_served_location:
+            #     test_flag_count+=1
+            # else:
+            #     test_flag_count=0
+            #     previous_request=latest_served_location
+            # if test_flag_count==15:
+            #     break
             print("-----------------------------------------------")
-            p, v = test.processRequest(sequence[i])
+            print("Request is -- ",latest_served_location)
+            p, v = test.processRequest(latest_served_location)
 
             print("Physical configurations: ", test.configuration)
             print("Virtual configurations: ", test.vPosition)
@@ -312,12 +334,18 @@ if __name__ == "__main__":
             print("Virtual cost: ", v, " Physical cost: ",p)
             vCost += v
             pCost += p
+            latest_served_location=test.latest_server
+            request_sequence.append(latest_served_location)
             print("-----------------------------------------------\n")
+            if len(request_sequence)==100:
+                break
         # print(initial_configuration)
+        print("Request sequence," ,request_sequence)
+        # exit()
         opt = ServerSpace(metric)
         print("Second,", initial_configuration)
         opt.add_servers(initial_configuration)
-        optimal_cost = opt.process_requests(sequence)[0]
+        optimal_cost = opt.process_requests(request_sequence)[0]
         # optimal_cost=1 if optimal_cost==0 else optimal_cost
         print("Total physical cost: ", pCost)
         print("Total virtual cost: ", vCost)
@@ -330,13 +358,13 @@ if __name__ == "__main__":
         print()
         # fields=['VirtualDC-Cost','PhysicalCost','OptimalCost','vCost
 
-        li = [vCost, pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,sequence]
-        # with open('special-Case.csv','a') as csvfile:
-        #     csvwriter=writer(csvfile)
-        #     # csvwriter.writerow(fields)
-        #     csvwriter.writerow(li)
-        #     csvfile.close()
-        print(len(sequence))
+        li = [vCost, pCost,optimal_cost,vCost/optimal_cost,pCost/optimal_cost,request_sequence]
+        with open('dataset.csv','a') as csvfile:
+            csvwriter=writer(csvfile)
+            # csvwriter.writerow(fields)
+            csvwriter.writerow(li)
+            csvfile.close()
+        print(len(request_sequence))
 
 #[9, 11, 8, 10, 12, 8, 9, 9, 10, 10, 11, 11, 9, 10, 10, 11, 10, 9, 11, 9, 10, 11, 9, 10, 12, 9, 10, 11, 10, 10, 9, 9, 9, 9, 10, 8, 9, 9, 11, 10, 11, 10, 11, 10, 10, 9, 10, 11, 10, 9]
 #First  [13, 14, 15]

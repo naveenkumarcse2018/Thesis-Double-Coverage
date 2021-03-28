@@ -35,7 +35,7 @@ for t in range(10):
     nextL = [i if i> 0 and i <= n else n for i in nextL]
     sequence.extend(nextL)
     print(sequence)
-    initial = random.sample(range(1, n), k)  # [1, 3, 11]#
+    initial = random.sample(range(1, n+1), k)  # [1, 3, 11]#
     initial.sort()
     initial_configuration = list(initial)
     print("First ",initial_configuration)
