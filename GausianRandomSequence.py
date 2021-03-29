@@ -40,12 +40,12 @@ for t in range(1):
     pCost = 0
     for r in sequence:
         p, v = test.processRequest(r)
-        # print("-------------------------------------------------------")
-        # print("Physical configurations: ", test.configuration)
-        # print("Virtual configurations: ", test.vPosition)
-        # print("Virtual distance : ", test.vDistance)
-        # print("Virtual cost: ", v, " Physical cost: ", p)
-        # print("-------------------------------------------------------\n")
+        print("-------------------------------------------------------")
+        print("Physical configurations: ", test.configuration)
+        print("Virtual configurations: ", test.vPosition)
+        print("Virtual distance : ", test.vDistance)
+        print("Virtual cost: ", v, " Physical cost: ", p)
+        print("-------------------------------------------------------\n")
         vCost += v
         pCost += p
     print(vCost, pCost)
