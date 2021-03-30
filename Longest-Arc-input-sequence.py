@@ -17,9 +17,9 @@ tests = 20
 
 
 def c_metric(a, b):
-    a = 0 if not a else a % perim
-    b = 0 if not b else b % perim
-    d = (b-a) % perim
+    # a = 0 if not a else a % perim
+    # b = 0 if not b else b % perim
+    d = abs(b-a) #% perim
     if d > perim//2:
         return perim-d
     return d
@@ -50,11 +50,11 @@ def generate(conf):
 
 if __name__ == "__main__":
     """Test case. Duh!"""
-    ns = 3
+    ns = 5
     perim=20
-    tests=20
+    tests=150
     
-    for t in range(5):
+    for t in range(10):
         request_sequence=[]
         vCost = 0
         pCost = 0
@@ -71,12 +71,13 @@ if __name__ == "__main__":
         # 	print(initial[q], end=" ")
 
         onlineCost = 0
-        for i in range(perim):
+        for i in range(tests):
             mid = generate(test.configuration)
             # wf.add_request(mid)
             request_sequence.append(mid)
             print("-----------------------------------------------")
-            p, v = test.processRequest(i+1)
+            o=(i+1)%perim
+            p, v = test.processRequest(o)
 
             print("Physical configurations: ", test.configuration)
             print("Virtual configurations: ", test.vPosition)
@@ -89,20 +90,20 @@ if __name__ == "__main__":
         print(request_sequence, "\n")
         print(len(request_sequence))
                 # print(initial_configuration)
-        opt = ServerSpace(c_metric)
-        print("Second,", initial_configuration)
-        opt.add_servers(initial_configuration)
-        optimal_cost = opt.process_requests(request_sequence)[0]
-        # optimal_cost=1 if optimal_cost==0 else optimal_cost
-        print("Total physical cost: ", pCost)
-        print("Total virtual cost: ", vCost)
-        print("Optimal cost: ", optimal_cost)
-        pCost = 1 if pCost == 0 else pCost
-        vCost = 1 if vCost == 0 else vCost
-        optimal_cost = 1 if optimal_cost == 0 else optimal_cost
-        print("(Virtual ) Competitive ratio: ", vCost/optimal_cost)
-        print("(Physical ) Competitive ratio: ", pCost/optimal_cost)
-        print()
+        # opt = ServerSpace(c_metric)
+        # print("Second,", initial_configuration)
+        # opt.add_servers(initial_configuration)
+        # optimal_cost = opt.process_requests(request_sequence)[0]
+        # # optimal_cost=1 if optimal_cost==0 else optimal_cost
+        # print("Total physical cost: ", pCost)
+        # print("Total virtual cost: ", vCost)
+        # print("Optimal cost: ", optimal_cost)
+        # pCost = 1 if pCost == 0 else pCost
+        # vCost = 1 if vCost == 0 else vCost
+        # optimal_cost = 1 if optimal_cost == 0 else optimal_cost
+        # print("(Virtual ) Competitive ratio: ", vCost/optimal_cost)
+        # print("(Physical ) Competitive ratio: ", pCost/optimal_cost)
+        # print()
         li = [perim, ns,len(request_sequence),request_sequence]
         with open('Longest-Arc.csv','a') as csvfile:
             csvwriter=writer(csvfile)

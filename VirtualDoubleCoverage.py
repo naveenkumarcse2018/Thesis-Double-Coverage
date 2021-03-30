@@ -16,12 +16,13 @@ This metric function will calucate the distance between two points on a cycle
 """
 
 
-def metric(server, request):
-    difference = abs(request-server)
-    if difference > points/2:
-        difference = points-difference
-
-    return difference
+def metric(a, b):
+    # a = 0 if not a else a % points
+    # b = 0 if not b else b % points
+    d = abs(b-a) #% points
+    if d > points//2:
+        return points-d
+    return d
 
 
 """
@@ -36,8 +37,7 @@ class VirtualDoubleCoverage(object):
         self.configuration = config   # Configuration of servers
         # True if server has virtual move
         self.vMove = [False for i in range(k)]
-        self.vPosition = [config[i]
-            for i in range(k)]  # virtual server positions
+        self.vPosition = [config[i] for i in range(k)]  # virtual server positions
         # virtual server travelled distance
         self.vDistance = [0 for i in range(k)]
 
@@ -139,14 +139,20 @@ class VirtualDoubleCoverage(object):
         return leftServer, rightServer
 
     # Calculates distance between two points
-    def distance(self, server, request):
-        # print("server ",server, "request ",request)
-        difference = abs(request-server)
-        # print("Actual distance is ",difference)
-        if difference > self.points/2:
-            difference = self.points-difference
+    def distance(self, a, b):
+        # # print("server ",server, "request ",request)
+        # difference = abs(request-server)
+        # # print("Actual distance is ",difference)
+        # if difference > self.points/2:
+        #     difference = self.points-difference
 
-        return difference
+        # return difference
+        # a = 0 if not a else a % self.points
+        # b = 0 if not b else b % self.points
+        d = abs(b-a) #% self.points
+        if d > self.points//2:
+            return self.points-d
+        return d
 
     """
         This function will take server id by which the request is server and changes the configurations
@@ -176,7 +182,7 @@ class VirtualDoubleCoverage(object):
         elif request in self.vPosition:  # If the virtual servers at requested location
 
             # if two are more virtual servers at location then serve with lower id
-            # print("Requested Locations has virtual server")
+            print("Requested Locations has virtual server")
             if self.vPosition.count(request) > 1:
                 ind = self.vPosition.index(request)
                 server_id = self.configuration[ind]
@@ -211,12 +217,14 @@ class VirtualDoubleCoverage(object):
 
             leftS_distance = self.vDistance[left_index]
             rightS_distance = self.vDistance[right_index]
-
+            prev_r=rightS
+            prev_l=leftS
             # print("Right ",rightS, " left ",leftS)
 
             while True:
                 # print("In while loop ",rightS , " points ",n)
-
+                prev_r=rightS
+                prev_l=leftS
                 rightS = rightS+1
                 leftS -= 1
                 if rightS == n+1:
@@ -239,6 +247,8 @@ class VirtualDoubleCoverage(object):
                         self.makeUpdates(right_index, request)
                         physical_cost = self.distance(
                             temp_config[right_index], request)
+                        leftS_distance-=1
+                        leftS=prev_l
                         self.vDistance[left_index] = leftS_distance
                         self.vPosition[left_index] = leftS
                         self.vMove[left_index] = True
@@ -249,6 +259,8 @@ class VirtualDoubleCoverage(object):
                         self.makeUpdates(left_index, request)
                         physical_cost = self.distance(
                             temp_config[left_index], request)
+                        rightS_distance-=1
+                        rightS=prev_r
                         self.vDistance[right_index] = rightS_distance
                         self.vPosition[right_index] = rightS
                         self.vMove[right_index] = True
@@ -279,6 +291,56 @@ class VirtualDoubleCoverage(object):
                     self.vPosition[right_index] = rightS
                     self.vMove[right_index] = True
                     return physical_cost, virtual_cost
+                elif leftS-1==request and rightS+1==request:
+                    print("----------Both servers are at same distance---->")
+                    # if leftS-1==request and rightS+1==request:
+                    if self.configuration[right_index] < self.configuration[left_index]:
+                        temp_config = list(self.configuration)
+                        rightS_distance+=1
+                        virtual_cost = rightS_distance
+                        self.makeUpdates(right_index, request)
+                        physical_cost = self.distance(
+                            temp_config[right_index], request)
+                        self.vDistance[left_index] = leftS_distance
+                        self.vPosition[left_index] = leftS
+                        self.vMove[left_index] = True
+                        return physical_cost, virtual_cost
+                    else:
+                        temp_config = list(self.configuration)
+                        leftS_distance+=1
+                        virtual_cost = leftS_distance
+                        self.makeUpdates(left_index, request)
+                        physical_cost = self.distance(
+                            temp_config[left_index], request)
+                        self.vDistance[right_index] = rightS_distance
+                        self.vPosition[right_index] = rightS
+                        self.vMove[right_index] = True
+                        return physical_cost, virtual_cost
+                    # elif leftS-1==request:
+                    #     temp_config = list(self.configuration)
+                    #     leftS_distance+=1
+                    #     virtual_cost = leftS_distance
+                    #     # print("Naveen ",temp_config)
+                    #     self.makeUpdates(left_index, request)
+                    #     # print("Anil , ", temp_config)
+                    #     physical_cost = self.distance(
+                    #         temp_config[left_index], request)
+                    #     self.vDistance[right_index] = rightS_distance
+                    #     self.vPosition[right_index] = rightS
+                    #     self.vMove[right_index] = True
+                    #     return physical_cost, virtual_cost
+                    # else:
+                    #     temp_config = list(self.configuration)
+                    #     rightS_distance+=1
+                    #     virtual_cost = rightS_distance
+                    #     self.makeUpdates(right_index, request)
+                    #     physical_cost = self.distance(
+                    #         temp_config[right_index], request)
+                    #     self.vDistance[left_index] = leftS_distance
+                    #     self.vPosition[left_index] = leftS
+                    #     self.vMove[left_index] = True
+                    #     return physical_cost, virtual_cost
+
 
 
 if __name__ == "__main__":
@@ -287,8 +349,8 @@ if __name__ == "__main__":
     for t in range(1):
         print("\nTEST CASE ,", t+1)
         # [6,13,17 ,15, 11,  8 ,20, 12 , 7,  1]#
-        sequence = [9, 11, 8, 10, 12, 8, 9, 9, 10, 10, 11, 11, 9, 10, 10, 11, 10, 9, 11, 9, 10, 11, 9, 10, 12, 9, 10, 11, 10, 10, 9, 9, 9, 9, 10, 8, 9, 9, 11, 10, 11, 10, 11, 10, 10, 9, 10, 11, 10, 9]#[11, 9, 13, 9, 9, 10, 13, 10, 8, 11, 10, 9, 10, 11, 10, 10, 10, 10, 9, 10, 10, 9, 9, 11, 10, 12, 10, 8, 9, 11, 11, 10, 9, 11, 10, 12, 9, 10, 10, 11, 10, 10, 10, 10, 8, 10, 10, 11, 9, 10, 10, 9, 10, 12, 9, 10, 9, 10, 10, 11, 11, 11, 11, 10, 9, 10, 11, 11, 10, 11, 10, 11, 12, 10, 10, 9, 10, 10, 11, 10, 10, 11, 9, 9, 8, 8, 10, 10, 11, 10, 8, 11, 10, 11, 10, 9, 8, 10, 8, 9, 10, 9, 10, 10, 11, 10, 11, 9, 9, 11, 13, 9, 11, 11, 10, 9, 9, 9, 10, 11, 9, 11, 10, 9, 8, 10, 9, 11, 11, 11, 9, 11, 9, 11, 12, 10, 11, 10, 10, 11, 12, 11, 11, 11, 9, 11, 9, 9, 10, 11]#[9, 10, 9, 10, 12, 11, 9, 9, 9, 9, 11, 10, 8, 11, 9, 9, 10, 9, 11, 10, 11, 10, 11, 11, 10, 10, 10, 11, 10, 9, 9, 10, 9, 9, 11, 10, 13, 11, 9, 10, 11, 9, 9, 11, 12, 9, 9, 11, 11, 10, 11, 11, 8, 11, 12, 10, 8, 12, 9, 9, 13, 10, 10, 10, 10, 11, 10, 11, 11, 10, 8, 10, 11, 10, 11, 10, 9, 11, 11, 10, 9, 12, 10, 10, 11, 11, 11, 10, 9, 11, 10, 9, 8, 13, 11, 11, 10, 10, 10, 10, 10, 10, 9, 9, 9, 12, 11, 10, 12, 10, 9, 10, 9, 11, 11, 11, 10, 12, 11, 9, 10, 12, 10, 12, 9, 12, 12, 10, 10, 11, 13, 9, 12, 11, 9, 9, 11, 10, 8, 10, 11, 9, 12, 11, 9, 11, 9, 8, 11, 11, 10, 10, 9, 11, 9, 10, 9, 10, 10, 10, 9, 11, 11, 8, 9, 11, 8, 11, 10, 11, 10, 13, 10, 9, 9, 12, 9, 9, 10, 11, 10, 9, 10, 11, 10, 10, 11, 10, 9, 10, 9, 10, 10, 8, 8, 9, 10, 10, 9, 10]#[9, 10, 11, 10, 8, 10, 9, 10, 10, 9, 10, 10, 9, 11, 10, 8, 11, 11, 10, 10, 9, 12, 10, 10, 10, 12, 11, 10, 10, 9, 10, 9, 10, 11, 8, 9, 11, 11, 10, 10, 10, 9, 9, 11, 10, 11, 10, 11, 10, 10, 10, 9, 11, 10, 11, 10, 11, 11, 11, 11, 9, 10, 8, 10, 10, 10, 11, 8, 11, 10, 9, 10, 10, 12, 9, 11, 10, 11, 9, 10, 9, 10, 10, 9, 9, 10, 8, 9, 10, 11, 11, 12, 10, 13, 12, 8, 8, 11, 11, 9]#[11, 9, 9, 11, 10, 9, 10, 10, 10, 11, 9, 10, 11, 11, 8, 10, 8, 10, 9, 8, 11, 9, 12, 11, 10, 10, 9, 9, 10, 11, 10, 11, 12, 10, 10, 11, 10, 10, 10, 10, 10, 9, 10, 11, 9, 10, 9, 11, 10, 11]#np.random.randint(1, n+1, 10)
-        initial = [13, 14, 15]#[5, 8, 10, 12, 14]#[7, 8, 17,18,20]#random.sample(range(1, n+1), k)  # [1, 3, 11]#
+        sequence = np.random.randint(1, n+1, 15)
+        initial =random.sample(range(1, n+1), k)  #[13, 14, 15]#[5, 8, 10, 12, 14]#[7, 8, 17,18,20]#random.sample(range(1, n+1), k)  # [1, 3, 11]#
         # print(sequence)
         initial.sort()
         initial_configuration = list(initial)
